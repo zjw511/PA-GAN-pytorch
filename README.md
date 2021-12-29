@@ -1,23 +1,24 @@
-# AttGAN-PyTorch
+# PA-GAN-PyTorch
 
-A PyTorch implementation of AttGAN - [Arbitrary Facial Attribute Editing: Only Change What You Want](https://arxiv.org/abs/1711.10678)
+A PyTorch implementation of PA-GAN - [PA-GAN: Progressive Attention Generative Adversarial Network for Facial Attribute Editing](https://arxiv.org/abs/2007.05892)
 
-![Teaser](https://github.com/elvisyjlin/AttGAN-PyTorch/blob/master/pics/teaser.jpg)
+This tf rpo to pytorch rpo was done by UESTC IVIPC team ZJW ,our team github is [Learning in Vision](https://github.com/learninginvision) 
+
+<!-- ![Teaser](https://github.com/elvisyjlin/AttGAN-PyTorch/blob/master/pics/teaser.jpg)
 Test on the CelebA validating set
 
 ![Custom](https://github.com/elvisyjlin/AttGAN-PyTorch/blob/master/pics/custom_images.jpg)
-Test on my custom set
+Test on my custom set -->
 
 Inverting 13 attributes respectively. From left to right: _Input, Reconstruction, Bald, Bangs, Black_Hair, Blond_Hair, Brown_Hair, Bushy_Eyebrows, Eyeglasses, Male, Mouth_Slightly_Open, Mustache, No_Beard, Pale_Skin, Young_
 
-The original TensorFlow version can be found [here](https://github.com/LynnHo/AttGAN-Tensorflow).
+The original TensorFlow version can be found [here](https://github.com/LynnHo/PA-GAN-Tensorflow).
 
 
 ## Requirements
 
 * Python 3
-* PyTorch 0.4.0
-* TensorboardX
+* PyTorch 1.7.0
 
 ```bash
 pip3 install -r requirements.txt
@@ -25,9 +26,6 @@ pip3 install -r requirements.txt
 
 If you'd like to train with __multiple GPUs__, please install PyTorch __v0.4.0__ instead of v1.0.0 or above. The so-called stable version of PyTorch has a bunch of problems with regard to `nn.DataParallel()`. E.g. https://github.com/pytorch/pytorch/issues/15716, https://github.com/pytorch/pytorch/issues/16532, etc.
 
-```bash
-pip3 install --upgrade torch==0.4.0
-```
 
 * Dataset
   * [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) dataset
@@ -39,7 +37,8 @@ pip3 install --upgrade torch==0.4.0
     * Please see [here](https://github.com/willylulu/celeba-hq-modified).
     * _Images_ should be placed in `./data/celeba-hq/celeba-*/*.jpg`
     * _Image list_ should be placed in `./data/image_list.txt`
-* [Pretrained models](http://bit.ly/attgan-pretrain): download the models you need and unzip the files to `./output/` as below,
+    * Pretrained models wait to be published
+<!-- * [Pretrained models](http://bit.ly/attgan-pretrain): download the models you need and unzip the files to `./output/` as below,
   ```text
   output
   ├── 128_shortcut1_inject0_none
@@ -50,7 +49,7 @@ pip3 install --upgrade torch==0.4.0
   ├── 256_shortcut1_inject1_none_hq
   ├── 384_shortcut1_inject0_none_hq
   └── 384_shortcut1_inject1_none_hq
-  ```
+  ``` -->
 
 ## Usage
 
@@ -60,9 +59,7 @@ pip3 install --upgrade torch==0.4.0
 CUDA_VISIBLE_DEVICES=0 \
 python train.py \
 --img_size 128 \
---shortcut_layers 1 \
---inject_layers 1 \
---experiment_name 128_shortcut1_inject1_none \
+--experiment_name default \
 --gpu
 ```
 
@@ -73,9 +70,7 @@ CUDA_VISIBLE_DEVICES=0 \
 python train.py \
 --data CelebA-HQ \
 --img_size 256 \
---shortcut_layers 1 \
---inject_layers 1 \
---experiment_name 256_shortcut1_inject1_none_hq \
+--experiment_name default \
 --gpu \
 --multi_gpu
 ```
@@ -87,6 +82,9 @@ tensorboard \
 --logdir ./output
 ```
 
+#### wandb
+if you want to use wandb , yout can chang wandb exegesis in `train.py`
+
 #### To test with single attribute editing
 
 ![Test](https://github.com/elvisyjlin/AttGAN-PyTorch/blob/master/pics/sample_testing.jpg)
@@ -94,23 +92,10 @@ tensorboard \
 ```bash
 CUDA_VISIBLE_DEVICES=0 \
 python test.py \
---experiment_name 128_shortcut1_inject1_none \
---test_int 1.0 \
+--experiment_name default \
 --gpu
 ```
 
-#### To test with multiple attributes editing
-
-![Test Multi](https://github.com/elvisyjlin/AttGAN-PyTorch/blob/master/pics/sample_testing_multi.jpg)
-
-```bash
-CUDA_VISIBLE_DEVICES=0 \
-python test_multi.py \
---experiment_name 128_shortcut1_inject1_none \
---test_atts Pale_Skin Male \
---test_ints 0.5 0.5 \
---gpu
-```
 
 #### To test with attribute intensity control
 
@@ -119,7 +104,7 @@ python test_multi.py \
 ```bash
 CUDA_VISIBLE_DEVICES=0 \
 python test_slide.py \
---experiment_name 128_shortcut1_inject1_none \
+--experiment_name default \
 --test_att Male \
 --test_int_min -1.0 \
 --test_int_max 1.0 \
@@ -132,7 +117,7 @@ python test_slide.py \
 ```bash
 CUDA_VISIBLE_DEVICES=0 \
 python test.py \
---experiment_name 384_shortcut1_inject1_none_hq \
+--experiment_name default \
 --test_int 1.0 \
 --gpu \
 --custom_img

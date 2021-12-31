@@ -36,7 +36,7 @@ def parse(args=None):
     parser.add_argument('--data_path', dest='data_path', type=str, default='/home/lilipan/桌面/AAAI22/data/celeba/img_align_celeba')
     parser.add_argument('--attr_path', dest='attr_path', type=str, default='/home/lilipan/桌面/AAAI22/data/celeba/list_attr_celeba.txt')
     parser.add_argument('--image_list_path', dest='image_list_path', type=str, default='data/image_list.txt')
-    
+    parser.add_argument('--load_size', dest='load_size', type=int, default=143)
     parser.add_argument('--img_size', dest='img_size', type=int, default=128)
     # parser.add_argument('--shortcut_layers', dest='shortcut_layers', type=int, default=1)
     # parser.add_argument('--inject_layers', dest='inject_layers', type=int, default=0)
@@ -49,12 +49,12 @@ def parse(args=None):
     parser.add_argument('--dis_layers', dest='dis_layers', type=int, default=5)
     parser.add_argument('--enc_norm', dest='enc_norm', type=str, default='batchnorm')
     parser.add_argument('--dec_norm', dest='dec_norm', type=str, default='batchnorm')
-    parser.add_argument('--dis_norm', dest='dis_norm', type=str, default='instancenorm')
+    parser.add_argument('--dis_norm', dest='dis_norm', type=str, default='layernorm')
     parser.add_argument('--dis_fc_norm', dest='dis_fc_norm', type=str, default='none')
-    parser.add_argument('--enc_acti', dest='enc_acti', type=str, default='lrelu')
+    parser.add_argument('--enc_acti', dest='enc_acti', type=str, default='relu')
     parser.add_argument('--dec_acti', dest='dec_acti', type=str, default='relu')
     parser.add_argument('--dis_acti', dest='dis_acti', type=str, default='lrelu')
-    parser.add_argument('--dis_fc_acti', dest='dis_fc_acti', type=str, default='relu')
+    parser.add_argument('--dis_fc_acti', dest='dis_fc_acti', type=str, default='lrelu')
     parser.add_argument('--lambda_1', dest='lambda_1', type=float, default=100.0)
     parser.add_argument('--lambda_2', dest='lambda_2', type=float, default=10.0)
     parser.add_argument('--lambda_3', dest='lambda_3', type=float, default=1.0)
@@ -76,7 +76,7 @@ def parse(args=None):
     
     parser.add_argument('--b_distribution', dest='b_distribution', default='none', choices=['none', 'uniform', 'truncated_normal'])
     parser.add_argument('--thres_int', dest='thres_int', type=float, default=1.0)
-    parser.add_argument('--test_int', dest='test_int', type=float, default=1.0)
+    parser.add_argument('--test_int', dest='test_int', type=float, default=1.5)
     parser.add_argument('--n_samples', dest='n_samples', type=int, default=16, help='# of sample images')
     
     parser.add_argument('--save_interval', dest='save_interval', type=int, default=1000)
@@ -102,8 +102,8 @@ with open(join('output', args.experiment_name, 'setting.txt'), 'w') as f:
 
 if args.data == 'CelebA':
     from data import CelebA
-    train_dataset = CelebA(args.data_path, args.attr_path, args.img_size, 'train', args.attrs)
-    valid_dataset = CelebA(args.data_path, args.attr_path, args.img_size, 'valid', args.attrs)
+    train_dataset = CelebA(args.data_path, args.attr_path, args.load_size ,args.img_size, 'train', args.attrs)
+    valid_dataset = CelebA(args.data_path, args.attr_path,  args.load_size ,args.img_size, 'valid', args.attrs)
 if args.data == 'CelebA-HQ':
     from data import CelebA_HQ
     train_dataset = CelebA_HQ(args.data_path, args.attr_path, args.image_list_path, args.img_size, 'train', args.attrs)
@@ -192,6 +192,8 @@ for epoch in range(args.epochs):
                 ms_opt_list = []
                 for i, att_b in enumerate(sample_att_b_list):
                     att_b_ = (att_b * 2 - 1) 
+                    if i > 0 :
+                        att_b_[...,i-1] = att_b_[...,i-1] * args.test_int
                     # samples.append(pagan.G(fixed_img_a, att_b_-))
                     att_a = fixed_att_a*2-1
                     sample,sample_e,sample_mask,_ = pagan.G(fixed_img_a, att_b_-att_a)

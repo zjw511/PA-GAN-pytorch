@@ -102,10 +102,12 @@ class Discriminators(nn.Module):
         
         layers = []
         n_in = 3
+        shape = 128
         for i in range(n_layers):
+            shape = shape//2
             n_out = min(dim * 2**i, MAX_DIM)
             layers += [Conv2dBlock(
-                n_in, n_out, (4, 4), stride=2, padding=1, norm_fn=norm_fn, acti_fn=acti_fn
+                n_in, n_out, (4, 4), stride=2, padding=1, norm_fn=norm_fn, acti_fn=acti_fn, shape=[n_out,shape,shape]
             )]
             n_in = n_out
         self.conv = nn.Sequential(*layers)
@@ -245,7 +247,9 @@ class PAGAN():
             )[0]
             grad = grad.view(grad.size(0), -1)
             norm = grad.norm(2, dim=1)
-            gp = ((norm - 1.0) ** 2).mean()
+            # gp = ((norm - 1.0) ** 2).mean()  #one mean gp
+            others = torch.zeros_like(norm,device=norm.device)
+            gp = torch.mean(torch.maximum(norm-1,others )**2) # _lipschitz_penalty
             return gp
         
         if self.mode == 'wgan':

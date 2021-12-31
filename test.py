@@ -23,7 +23,7 @@ from utils import find_model
 def parse(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--experiment_name', dest='experiment_name', required=True)
-    parser.add_argument('--test_int', dest='test_int', type=float, default=1.0)
+    parser.add_argument('--test_int', dest='test_int', type=float, default=2)
     parser.add_argument('--num_test', dest='num_test', type=int)
     parser.add_argument('--load_epoch', dest='load_epoch', type=str, default='latest')
     parser.add_argument('--custom_img', action='store_true')

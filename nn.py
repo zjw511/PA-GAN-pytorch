@@ -21,11 +21,13 @@ def add_normalization_1d(layers, fn, n_out):
         layers.append(Squeeze(-1))
     elif fn == 'switchnorm':
         layers.append(SwitchNorm1d(n_out))
+    elif fn == 'layernorm':
+        layers.append(nn.LayerNorm(n_out))
     else:
         raise Exception('Unsupported normalization: ' + str(fn))
     return layers
 
-def add_normalization_2d(layers, fn, n_out):
+def add_normalization_2d(layers, fn, n_out,shape):
     if fn == 'none':
         pass
     elif fn == 'batchnorm':
@@ -34,6 +36,8 @@ def add_normalization_2d(layers, fn, n_out):
         layers.append(nn.InstanceNorm2d(n_out, affine=True))
     elif fn == 'switchnorm':
         layers.append(SwitchNorm2d(n_out))
+    elif fn == 'layernorm':
+        layers.append(nn.LayerNorm(shape))
     else:
         raise Exception('Unsupported normalization: ' + str(fn))
     return layers
@@ -71,7 +75,7 @@ class Unsqueeze(nn.Module):
 
 
 class LinearBlock(nn.Module):
-    def __init__(self, n_in, n_out, norm_fn='none', acti_fn='none'):
+    def __init__(self, n_in, n_out, norm_fn='none', acti_fn='none',shape = None):
         super(LinearBlock, self).__init__()
         layers = [nn.Linear(n_in, n_out, bias=(norm_fn=='none'))]
         layers = add_normalization_1d(layers, norm_fn, n_out)
@@ -83,10 +87,10 @@ class LinearBlock(nn.Module):
 
 class Conv2dBlock(nn.Module):
     def __init__(self, n_in, n_out, kernel_size, stride=1, padding=0, 
-                 norm_fn=None, acti_fn=None):
+                 norm_fn=None, acti_fn=None,shape = None):
         super(Conv2dBlock, self).__init__()
         layers = [nn.Conv2d(n_in, n_out, kernel_size, stride=stride, padding=padding, bias=(norm_fn=='none'))]
-        layers = add_normalization_2d(layers, norm_fn, n_out)
+        layers = add_normalization_2d(layers, norm_fn, n_out,shape)
         layers = add_activation(layers, acti_fn)
         self.layers = nn.Sequential(*layers)
     
@@ -95,10 +99,10 @@ class Conv2dBlock(nn.Module):
 
 class ConvTranspose2dBlock(nn.Module):
     def __init__(self, n_in, n_out, kernel_size, stride=1, padding=0, 
-                 norm_fn=False, acti_fn=None):
+                 norm_fn=False, acti_fn=None, shape=None):
         super(ConvTranspose2dBlock, self).__init__()
         layers = [nn.ConvTranspose2d(n_in, n_out, kernel_size, stride=stride, padding=padding, bias=(norm_fn=='none'))]
-        layers = add_normalization_2d(layers, norm_fn, n_out)
+        layers = add_normalization_2d(layers, norm_fn, n_out,shape)
         layers = add_activation(layers, acti_fn)
         self.layers = nn.Sequential(*layers)
     

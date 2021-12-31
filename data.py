@@ -36,7 +36,7 @@ class Custom(data.Dataset):
         return len(self.images)
 
 class CelebA(data.Dataset):
-    def __init__(self, data_path, attr_path, image_size, mode, selected_attrs):
+    def __init__(self, data_path, attr_path, load_size ,image_size, mode, selected_attrs):
         super(CelebA, self).__init__()
         self.data_path = data_path
         att_list = open(attr_path, 'r', encoding='utf-8').readlines()[1].split()
@@ -53,17 +53,27 @@ class CelebA(data.Dataset):
         if mode == 'test':
             self.images = images[182637:]
             self.labels = labels[182637:]
-        
-        self.tf = transforms.Compose([
-            transforms.CenterCrop(170),
-            transforms.Resize(image_size),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-        ])
+        if mode == 'train':
+            self.tf = transforms.Compose([
+                transforms.Resize(load_size),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomCrop(image_size),
+                # transforms.Resize(image_size),
+                transforms.ToTensor(),
+                # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ])
+        else:
+            self.tf = transforms.Compose([
+                transforms.Resize(load_size),
+                transforms.CenterCrop(image_size),
+                # transforms.Resize(image_size),
+                transforms.ToTensor(),
+                # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ])
                                        
         self.length = len(self.images)
     def __getitem__(self, index):
-        img = self.tf(Image.open(os.path.join(self.data_path, self.images[index])))
+        img = self.tf(Image.open(os.path.join(self.data_path, self.images[index])))*2-1
         att = torch.tensor((self.labels[index] + 1) // 2)
         return img, att
     def __len__(self):
@@ -132,10 +142,10 @@ def check_attribute_conflict(att_batch, att_name, att_names):
             for n in ['Straight_Hair', 'Wavy_Hair']:
                 if n != att_name and _get(att, n) != 0:
                     _set(att, 1-att[att_id], n)
-        elif att_name in ['Mustache', 'No_Beard'] and att[att_id] != 0:
-            for n in ['Mustache', 'No_Beard']:
-                if n != att_name and _get(att, n) != 0:
-                    _set(att, 1-att[att_id], n)
+        # elif att_name in ['Mustache', 'No_Beard'] and att[att_id] != 0:
+        #     for n in ['Mustache', 'No_Beard']:
+        #         if n != att_name and _get(att, n) != 0:
+        #             _set(att, 1-att[att_id], n)
     return att_batch
 
 

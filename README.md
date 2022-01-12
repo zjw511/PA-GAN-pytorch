@@ -14,6 +14,7 @@ Inverting 13 attributes respectively. From left to right: _Input, Reconstruction
 
 The original TensorFlow version can be found [here](https://github.com/LynnHo/PA-GAN-Tensorflow).
 
+[*] upload datasets
 
 ## Requirements
 
@@ -28,6 +29,7 @@ If you'd like to train with __multiple GPUs__, please install PyTorch __v0.4.0__
 
 
 * Dataset
+  * [CelebA pagan](https://pan.baidu.com/s/1BcFi8nu8nxVpO-geOrSeWA?pwd=2v6f) 源于PAGAN代码中处理出来的数据
   * [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) dataset
     * [Images](https://www.dropbox.com/sh/8oqt9vytwxb3s4r/AADSNUu0bseoCKuxuI5ZeTl1a/Img?dl=0&preview=img_align_celeba.zip) should be placed in `./data/img_align_celeba/*.jpg`
     * [Attribute labels](https://www.dropbox.com/sh/8oqt9vytwxb3s4r/AAA8YmAHNNU6BEfWMPMfM6r9a/Anno?dl=0&preview=list_attr_celeba.txt) should be placed in `./data/list_attr_celeba.txt`

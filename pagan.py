@@ -102,7 +102,7 @@ class Discriminators(nn.Module):
         
         layers = []
         n_in = 3
-        shape = 128
+        shape = img_size
         for i in range(n_layers):
             shape = shape//2
             n_out = min(dim * 2**i, MAX_DIM)

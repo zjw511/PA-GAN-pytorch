@@ -72,6 +72,7 @@ CUDA_VISIBLE_DEVICES=0 \
 python train.py \
 --data CelebA-HQ \
 --img_size 256 \
+--load_size 286 \
 --experiment_name default \
 --gpu \
 --multi_gpu

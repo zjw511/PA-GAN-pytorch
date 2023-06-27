@@ -99,7 +99,6 @@ python test.py \
 --gpu
 ```
 
-
 #### To test with attribute intensity control
 
 ![Test Slide](https://github.com/elvisyjlin/AttGAN-PyTorch/blob/master/pics/sample_testing_slide.jpg)
